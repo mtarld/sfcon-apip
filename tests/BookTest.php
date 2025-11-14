@@ -114,8 +114,6 @@ class BookTest extends ApiTestCase
             'json' => [
                 'name' => 'TITLE 2',
                 'description' => 'DESCRIPTION 2',
-                'isbn' => '9781794890268',
-                'price' => 200,
             ],
         ]);
 

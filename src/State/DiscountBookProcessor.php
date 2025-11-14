@@ -6,16 +6,28 @@ namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Entity\Book as BookEntity;
+use App\Api\Resource\Book;
 use App\ApiResource\DiscountBook;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 /**
- * @implements ProcessorInterface<DiscountBook, BookEntity>
+ * @implements ProcessorInterface<DiscountBook, Book>
  */
 final readonly class DiscountBookProcessor implements ProcessorInterface
 {
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): BookEntity
+    /**
+     * @param ProcessorInterface<BookEntity, BookEntity> $persistProcessor
+     */
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
+        private ProcessorInterface $persistProcessor,
+        private ObjectMapperInterface $objectMapper,
+    ) {
+    }
+
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Book
     {
         $entity = $context['request']->attributes->get('entity_data');
         if (!$entity) {
@@ -23,7 +35,8 @@ final readonly class DiscountBookProcessor implements ProcessorInterface
         }
 
         $entity->price = (int) ($entity->price * (1 - $data->percentage / 100));
+        $entity = $this->persistProcessor->process($entity, $operation, $uriVariables, $context);
 
-        return $entity;
+        return $this->objectMapper->map($entity, $operation->getClass());
     }
 }

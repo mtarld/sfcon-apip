@@ -10,8 +10,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Api\Dto\CreateBook;
-use App\Api\Dto\UpdateBook;
 use App\Api\Dto\DiscountBook;
+use App\Api\Dto\UpdateBook;
 use App\Entity\Book as BookEntity;
 use App\State\DiscountBookProcessor;
 use Symfony\Component\ObjectMapper\Attribute\Map;
@@ -20,7 +20,10 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
     stateOptions: new Options(entityClass: BookEntity::class),
     operations: [
         new Get(uriTemplate: '/books/{id}', uriVariables: ['id']),
-        new Post(uriTemplate: '/books', input: CreateBook::class),
+        new Post(
+            uriTemplate: '/books',
+            input: CreateBook::class,
+        ),
         new Post(
             uriTemplate: '/books/{id}/discount',
             uriVariables: ['id'],
