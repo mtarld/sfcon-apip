@@ -3,8 +3,8 @@
 namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use App\ApiResource\Book;
-use App\ApiResource\GetBookCollection;
+use App\Api\Resource\Book;
+use App\Api\Resource\GetBookCollection;
 use App\Entity\Book as BookEntity;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -20,17 +20,7 @@ class BookTest extends ApiTestCase
 
     public function testGetBook(): void
     {
-        /** @var EntityManagerInterface $em */
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-
-        $book = new BookEntity();
-        $book->title = 'TITLE';
-        $book->description = 'DESCRIPTION';
-        $book->isbn = '9780061964367';
-        $book->price = 100;
-
-        $em->persist($book);
-        $em->flush();
+        $this->createBook();
 
         static::createClient()->request('GET', '/api/books/1');
 
@@ -41,82 +31,52 @@ class BookTest extends ApiTestCase
             'id' => 1,
             'name' => 'TITLE',
             'description' => 'DESCRIPTION',
-            'isbn' => '9780061964367',
+            'isbn' => '9783058944793',
             'price' => '1.00$',
         ]);
     }
 
     public function testGetBooks(): void
     {
-        /** @var EntityManagerInterface $em */
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-
-        $book1 = new BookEntity();
-        $book1->title = 'TITLE';
-        $book1->description = 'DESCRIPTION';
-        $book1->isbn = '9780061964367';
-        $book1->price = 100;
-
-        $book2 = new BookEntity();
-        $book2->title = 'TITLE 2';
-        $book2->description = 'DESCRIPTION 2';
-        $book2->isbn = '9780061964368';
-        $book2->price = 200;
-
-        $em->persist($book1);
-        $em->persist($book2);
-        $em->flush();
+        $this->createBook();
+        $this->createBook(
+            title: 'TITLE 2',
+            description: 'DESCRIPTION 2',
+            isbn: '9781794890268',
+            price: 200,
+        );
 
         static::createClient()->request('GET', '/api/books');
 
         static::assertResponseIsSuccessful();
         static::assertMatchesResourceCollectionJsonSchema(GetBookCollection::class);
-
         static::assertJsonContains([
             'totalItems' => 2,
             'member' => [
-                [
-                    '@id' => '/api/books/1',
-                    'id' => 1,
-                    'name' => 'TITLE',
-                    'isbn' => '9780061964367',
-                ],
-                [
-                    '@id' => '/api/books/2',
-                    'id' => 2,
-                    'name' => 'TITLE 2',
-                    'isbn' => '9780061964368',
-                ],
+                ['@id' => '/api/books/1'],
+                ['@id' => '/api/books/2'],
             ],
         ]);
 
         static::createClient()->request('GET', '/api/books?name=2');
 
         static::assertResponseIsSuccessful();
+        static::assertMatchesResourceCollectionJsonSchema(GetBookCollection::class);
         static::assertJsonContains([
             'totalItems' => 1,
             'member' => [
-                [
-                    '@id' => '/api/books/2',
-                    'id' => 2,
-                    'name' => 'TITLE 2',
-                    'isbn' => '9780061964368',
-                ],
+                ['@id' => '/api/books/2'],
             ],
         ]);
 
-        static::createClient()->request('GET', '/api/books?isbn=9780061964368');
+        static::createClient()->request('GET', '/api/books?isbn=9781794890268');
 
         static::assertResponseIsSuccessful();
+        static::assertMatchesResourceCollectionJsonSchema(GetBookCollection::class);
         static::assertJsonContains([
             'totalItems' => 1,
             'member' => [
-                [
-                    '@id' => '/api/books/2',
-                    'id' => 2,
-                    'name' => 'TITLE 2',
-                    'isbn' => '9780061964368',
-                ],
+                ['@id' => '/api/books/2'],
             ],
         ]);
     }
@@ -128,7 +88,7 @@ class BookTest extends ApiTestCase
             'json' => [
                 'name' => 'TITLE',
                 'description' => 'DESCRIPTION',
-                'isbn' => '9780061964367',
+                'isbn' => '9783058944793',
                 'price' => 100,
             ],
         ]);
@@ -140,31 +100,21 @@ class BookTest extends ApiTestCase
             'id' => 1,
             'name' => 'TITLE',
             'description' => 'DESCRIPTION',
-            'isbn' => '9780061964367',
+            'isbn' => '9783058944793',
             'price' => '1.00$',
         ]);
     }
 
     public function testUpdateBook(): void
     {
-        /** @var EntityManagerInterface $em */
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-
-        $book = new BookEntity();
-        $book->title = 'TITLE';
-        $book->description = 'DESCRIPTION';
-        $book->isbn = '9780061964367';
-        $book->price = 100;
-
-        $em->persist($book);
-        $em->flush();
+        $this->createBook();
 
         static::createClient()->request('PATCH', '/api/books/1', [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
                 'name' => 'TITLE 2',
                 'description' => 'DESCRIPTION 2',
-                'isbn' => '9780061964368',
+                'isbn' => '9781794890268',
                 'price' => 200,
             ],
         ]);
@@ -176,14 +126,14 @@ class BookTest extends ApiTestCase
             'id' => 1,
             'name' => 'TITLE 2',
             'description' => 'DESCRIPTION 2',
-            'isbn' => '9780061964367',
-            'price' => '1.00$',
+            'isbn' => '9783058944793', // not updated
+            'price' => '1.00$', // not updated
         ]);
     }
 
     public function testDiscountMissingBook(): void
     {
-        static::createClient()->request('POST', '/api/books/99999/discount', [
+        static::createClient()->request('POST', '/api/books/1/discount', [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'percentage' => 50,
@@ -194,17 +144,7 @@ class BookTest extends ApiTestCase
 
     public function testDiscountBook(): void
     {
-        /** @var EntityManagerInterface $em */
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-
-        $book = new BookEntity();
-        $book->title = 'TITLE';
-        $book->description = 'DESCRIPTION';
-        $book->isbn = '9780061964367';
-        $book->price = 100;
-
-        $em->persist($book);
-        $em->flush();
+        $this->createBook();
 
         static::createClient()->request('POST', '/api/books/1/discount', [
             'headers' => ['Content-Type' => 'application/ld+json'],
@@ -213,7 +153,28 @@ class BookTest extends ApiTestCase
             ],
         ]);
         static::assertResponseStatusCodeSame(200);
+        static::assertMatchesResourceItemJsonSchema(Book::class);
+        static::assertJsonContains([
+            'price' => '0.50$',
+        ]);
+    }
 
-        // TODO test response
+    private function createBook(
+        ?string $title = null,
+        ?string $description = null,
+        ?string $isbn = null,
+        ?int $price = null,
+    ): void {
+        /** @var EntityManagerInterface $em */
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+
+        $book = new BookEntity();
+        $book->title = $title ?? 'TITLE';
+        $book->description = $description ?? 'DESCRIPTION';
+        $book->isbn = $isbn ?? '9783058944793';
+        $book->price = $price ?? 100;
+
+        $em->persist($book);
+        $em->flush();
     }
 }

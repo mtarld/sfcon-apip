@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\ApiResource;
+namespace App\Api\Dto;
 
 use App\Entity\Book as BookEntity;
 use Symfony\Component\Validator\Constraints as Assert;

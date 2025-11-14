@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\ApiResource;
+namespace App\Api\Dto;
 
 use App\Entity\Book as BookEntity;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[Map(target: BookEntity::class)]
-final class BookPatch
+final class UpdateBook
 {
     #[Map(target: 'title')]
     public string $name;

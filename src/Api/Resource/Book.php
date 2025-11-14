@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\ApiResource;
+namespace App\Api\Resource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Api\Dto\CreateBook;
+use App\Api\Dto\UpdateBook;
+use App\Api\Dto\DiscountBook;
 use App\Entity\Book as BookEntity;
 use App\State\DiscountBookProcessor;
 use Symfony\Component\ObjectMapper\Attribute\Map;
@@ -18,7 +21,7 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
     operations: [
         new Get(uriTemplate: '/books/{id}', uriVariables: ['id']),
         new Post(uriTemplate: '/books', input: CreateBook::class),
-        new Post( // RPC
+        new Post(
             uriTemplate: '/books/{id}/discount',
             uriVariables: ['id'],
             input: DiscountBook::class,
@@ -28,7 +31,7 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
         new Patch(
             uriTemplate: '/books/{id}',
             uriVariables: ['id'],
-            input: BookPatch::class,
+            input: UpdateBook::class,
         ),
     ],
 )]

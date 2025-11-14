@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\ApiResource;
+namespace App\Api\Resource;
 
 use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
@@ -14,22 +14,17 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\Validator\Constraints\Isbn;
 
 #[GetCollection(
-    shortName: 'Book',
     uriTemplate: '/books',
     itemUriTemplate: '/books/{id}',
     stateOptions: new Options(entityClass: BookEntity::class),
     parameters: [
-        new QueryParameter(
-            key: 'name',
+        'name' => new QueryParameter(
             property: 'title',
             filter: new PartialSearchFilter(),
         ),
-        new QueryParameter(
-            key: 'isbn',
+        'isbn' => new QueryParameter(
             filter: new ExactFilter(),
-            constraints: [
-                // new Isbn(), // TODO
-            ],
+            constraints: [new Isbn()],
         ),
     ],
 )]
