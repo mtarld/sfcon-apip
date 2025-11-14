@@ -15,12 +15,12 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
     itemUriTemplate: '/books/{id}',
     stateOptions: new Options(entityClass: BookEntity::class),
 )]
-#[Map(target: BookEntity::class)]
+#[Map(source: BookEntity::class)]
 final class GetBookCollection
 {
     public function __construct(
         public int $id,
-        #[Map(target: 'title')]
+        #[Map(source: 'title')]
         public string $name,
         public string $isbn,
     ) {

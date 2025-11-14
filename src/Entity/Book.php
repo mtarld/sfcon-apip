@@ -27,4 +27,8 @@ class Book
     #[Assert\NotBlank]
     #[Assert\Length(max: 255)]
     public string $description;
+
+    #[ORM\Column]
+    #[Assert\PositiveOrZero]
+    public int $price;
 }

@@ -23,4 +23,7 @@ final class CreateBook
     #[Assert\NotBlank]
     #[Assert\Isbn]
     public string $isbn;
+
+    #[Assert\PositiveOrZero]
+    public int $price;
 }
