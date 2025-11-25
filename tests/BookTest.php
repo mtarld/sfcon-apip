@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Api\Resource\Book;
-use App\Api\Resource\GetBookCollection;
 use App\Entity\Book as BookEntity;
 use Doctrine\ORM\EntityManagerInterface;
 
-class BookTest extends ApiTestCase
+final class BookTest extends ApiTestCase
 {
     protected static ?bool $alwaysBootKernel = true;
 
@@ -20,26 +21,26 @@ class BookTest extends ApiTestCase
 
     public function testGetBook(): void
     {
-        $this->createBook();
+        $book = $this->createBook();
 
-        static::createClient()->request('GET', '/api/books/1');
+        static::createClient()->request('GET', '/api/books/'.$book->id);
 
         static::assertResponseIsSuccessful();
         static::assertMatchesResourceItemJsonSchema(Book::class);
         static::assertJsonContains([
-            '@id' => '/api/books/1',
-            'id' => 1,
-            'name' => 'TITLE',
-            'description' => 'DESCRIPTION',
-            'isbn' => '9783058944793',
-            'price' => '1.00$',
+            '@id' => '/api/books/'.$book->id,
+            'id' => $book->id,
+            'name' => $book->title,
+            'description' => $book->description,
+            'isbn' => $book->isbn,
+            'price' => Book::formatPrice($book->price, $book),
         ]);
     }
 
     public function testGetBooks(): void
     {
-        $this->createBook();
-        $this->createBook(
+        $bookA = $this->createBook();
+        $bookB = $this->createBook(
             title: 'TITLE 2',
             description: 'DESCRIPTION 2',
             isbn: '9781794890268',
@@ -53,8 +54,8 @@ class BookTest extends ApiTestCase
         static::assertJsonContains([
             'totalItems' => 2,
             'member' => [
-                ['@id' => '/api/books/1'],
-                ['@id' => '/api/books/2'],
+                ['@id' => '/api/books/'.$bookA->id],
+                ['@id' => '/api/books/'.$bookB->id],
             ],
         ]);
 
@@ -65,7 +66,7 @@ class BookTest extends ApiTestCase
         static::assertJsonContains([
             'totalItems' => 1,
             'member' => [
-                ['@id' => '/api/books/2'],
+                ['@id' => '/api/books/'.$bookB->id],
             ],
         ]);
 
@@ -76,7 +77,7 @@ class BookTest extends ApiTestCase
         static::assertJsonContains([
             'totalItems' => 1,
             'member' => [
-                ['@id' => '/api/books/2'],
+                ['@id' => '/api/books/'.$bookB->id],
             ],
         ]);
     }
@@ -107,9 +108,9 @@ class BookTest extends ApiTestCase
 
     public function testUpdateBook(): void
     {
-        $this->createBook();
+        $book = $this->createBook();
 
-        static::createClient()->request('PATCH', '/api/books/1', [
+        static::createClient()->request('PATCH', '/api/books/'.$book->id, [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
                 'name' => 'TITLE 2',
@@ -120,12 +121,12 @@ class BookTest extends ApiTestCase
         static::assertResponseStatusCodeSame(200);
         static::assertMatchesResourceItemJsonSchema(Book::class);
         static::assertJsonContains([
-            '@id' => '/api/books/1',
+            '@id' => '/api/books/'.$book->id,
             'id' => 1,
             'name' => 'TITLE 2',
             'description' => 'DESCRIPTION 2',
-            'isbn' => '9783058944793', // not updated
-            'price' => '1.00$', // not updated
+            'isbn' => $book->isbn, // not updated
+            'price' => Book::formatPrice($book->price, $book), // not updated
         ]);
     }
 
@@ -142,18 +143,18 @@ class BookTest extends ApiTestCase
 
     public function testDiscountBook(): void
     {
-        $this->createBook();
+        $book = $this->createBook();
 
-        static::createClient()->request('POST', '/api/books/1/discount', [
+        static::createClient()->request('POST', '/api/books/'.$book->id.'/discount', [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => [
-                'percentage' => 50,
+                'percentage' => 20,
             ],
         ]);
         static::assertResponseStatusCodeSame(200);
         static::assertMatchesResourceItemJsonSchema(Book::class);
         static::assertJsonContains([
-            'price' => '0.50$',
+            'price' => Book::formatPrice(80, $book),
         ]);
     }
 
@@ -162,7 +163,7 @@ class BookTest extends ApiTestCase
         ?string $description = null,
         ?string $isbn = null,
         ?int $price = null,
-    ): void {
+    ): BookEntity {
         /** @var EntityManagerInterface $em */
         $em = static::getContainer()->get(EntityManagerInterface::class);
 
@@ -174,5 +175,7 @@ class BookTest extends ApiTestCase
 
         $em->persist($book);
         $em->flush();
+
+        return $book;
     }
 }

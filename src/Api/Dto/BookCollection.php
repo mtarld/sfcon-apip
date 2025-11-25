@@ -10,11 +10,10 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 #[Map(source: BookEntity::class)]
 final class BookCollection
 {
-    public function __construct(
-        public int $id,
-        #[Map(source: 'title')]
-        public string $name,
-        public string $isbn,
-    ) {
-    }
+    public int $id;
+
+    #[Map(source: 'title')]
+    public string $name;
+
+    public string $isbn;
 }

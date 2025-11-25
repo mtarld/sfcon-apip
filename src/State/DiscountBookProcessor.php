@@ -29,8 +29,7 @@ final readonly class DiscountBookProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Book
     {
-        $entity = $context['request']->attributes->get('entity_data');
-        if (!$entity) {
+        if (!$entity = $context['request']->attributes->get('read_data')) {
             throw new NotFoundHttpException('Not Found');
         }
 

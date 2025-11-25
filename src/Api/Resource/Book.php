@@ -18,43 +18,49 @@ use App\Api\Dto\CreateBook;
 use App\Api\Dto\DiscountBook;
 use App\Api\Dto\UpdateBook;
 use App\Entity\Book as BookEntity;
-use Symfony\Component\Validator\Constraints\Isbn;
 use App\State\DiscountBookProcessor;
 use Symfony\Component\ObjectMapper\Attribute\Map;
+use Symfony\Component\Validator\Constraints\Isbn;
 
 #[ApiResource(
     stateOptions: new Options(entityClass: BookEntity::class),
-)]
-#[Get(
-    uriTemplate: '/books/{id}',
-    uriVariables: ['id'],
-)]
-#[GetCollection(
-    uriTemplate: '/books',
-    output: BookCollection::class,
-    parameters: [
-        'name' => new QueryParameter(
-            property: 'title',
-            filter: new PartialSearchFilter(),
+    jsonStream: true,
+    operations: [
+        new Get(
+            uriTemplate: '/books/{id}',
+            uriVariables: ['id'],
         ),
-        'isbn' => new QueryParameter(
-            filter: new ExactFilter(),
-            constraints: [new Isbn()],
+        new GetCollection(
+            uriTemplate: '/books',
+            output: BookCollection::class,
+            parameters: [
+                'name' => new QueryParameter(
+                    property: 'title',
+                    filter: new PartialSearchFilter(),
+                ),
+                'isbn' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    constraints: [new Isbn()],
+                ),
+            ],
+        ),
+        new Patch(
+            uriTemplate: '/books/{id}',
+            uriVariables: ['id'],
+            input: UpdateBook::class,
+        ),
+        new Post(
+            uriTemplate: '/books',
+            input: CreateBook::class,
+        ),
+        new Post(
+            uriTemplate: '/books/{id}/discount',
+            uriVariables: ['id'],
+            input: DiscountBook::class,
+            processor: DiscountBookProcessor::class,
+            status: 200,
         ),
     ],
-)]
-#[Post(uriTemplate: '/books', input: CreateBook::class)]
-#[Post(
-    uriTemplate: '/books/{id}/discount',
-    uriVariables: ['id'],
-    input: DiscountBook::class,
-    processor: DiscountBookProcessor::class,
-    status: 200,
-)]
-#[Patch(
-    uriTemplate: '/books/{id}',
-    uriVariables: ['id'],
-    input: UpdateBook::class,
 )]
 #[Map(source: BookEntity::class)]
 final class Book
@@ -71,13 +77,13 @@ final class Book
     #[Map(transform: [self::class, 'formatPrice'])]
     public string $price;
 
-    public static function formatPrice(mixed $price, object $source, ?object $target): int|string
+    public static function formatPrice(mixed $price, object $source): int|string
     {
-        if ($target instanceof self) {
+        if ($source instanceof BookEntity) {
             return number_format($price / 100, 2).'$';
         }
 
-        if ($target instanceof BookEntity) {
+        if ($source instanceof self) {
             return 100 * (int) str_replace('$', '', $price);
         }
 
