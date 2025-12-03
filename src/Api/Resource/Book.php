@@ -23,8 +23,6 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\Validator\Constraints\Isbn;
 
 #[ApiResource(
-    stateOptions: new Options(entityClass: BookEntity::class),
-    jsonStream: true,
     operations: [
         new Get(
             uriTemplate: '/books/{id}',
@@ -35,8 +33,8 @@ use Symfony\Component\Validator\Constraints\Isbn;
             output: BookCollection::class,
             parameters: [
                 'name' => new QueryParameter(
-                    property: 'title',
                     filter: new PartialSearchFilter(),
+                    property: 'title',
                 ),
                 'isbn' => new QueryParameter(
                     filter: new ExactFilter(),
@@ -56,11 +54,13 @@ use Symfony\Component\Validator\Constraints\Isbn;
         new Post(
             uriTemplate: '/books/{id}/discount',
             uriVariables: ['id'],
+            status: 200,
             input: DiscountBook::class,
             processor: DiscountBookProcessor::class,
-            status: 200,
         ),
     ],
+    stateOptions: new Options(entityClass: BookEntity::class),
+    jsonStream: true,
 )]
 #[Map(source: BookEntity::class)]
 final class Book
@@ -76,6 +76,8 @@ final class Book
 
     #[Map(transform: [self::class, 'formatPrice'])]
     public string $price;
+
+    public Author $author;
 
     public static function formatPrice(mixed $price, object $source): int|string
     {

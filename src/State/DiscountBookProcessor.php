@@ -6,8 +6,9 @@ namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use App\Api\Dto\DiscountBook;
 use App\Api\Resource\Book;
-use App\ApiResource\DiscountBook;
+use App\Entity\Book as BookEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
