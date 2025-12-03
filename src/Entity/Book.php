@@ -33,4 +33,7 @@ class Book
     #[ORM\Column]
     #[Assert\PositiveOrZero]
     public int $price;
+
+    #[ORM\ManyToOne(targetEntity: Author::class)]
+    public Author $author;
 }
