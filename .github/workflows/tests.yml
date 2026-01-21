@@ -1,0 +1,43 @@
+name: CI
+
+on:
+    pull_request:
+    push:
+        branches:
+            - 'main'
+
+jobs:
+  tests:
+    name: PHPUnit (🐘 ${{ matrix.php-versions }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-versions: ['8.4', '8.5']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: 🐘 Setup PHP
+        uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2.36.0
+        with:
+          php-version: ${{ matrix.php-versions }}
+
+      - name: 🎵 Install Composer dependencies
+        uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # v3.1.1
+        env:
+            APP_ENV: test
+
+      - name: 💾 Create cache and test database
+        run: |
+          bin/console cache:warmup
+          bin/console doctrine:schema:update --force
+        env:
+          APP_ENV: test
+
+      - name: 🧪 Run tests
+        run: vendor/bin/phpunit --testdox --testdox-summary
+        env:
+            APP_ENV: test
