@@ -7,29 +7,29 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "api-platform/doctrine-orm": "^4.2.10",
-        "api-platform/symfony": "^4.2.10",
-        "doctrine/dbal": "^3.10.4",
-        "doctrine/doctrine-bundle": "^2.18.1",
-        "doctrine/orm": "^3.5.8",
-        "nelmio/cors-bundle": "^2.6",
-        "phpdocumentor/reflection-docblock": "^5.6.5",
-        "phpstan/phpdoc-parser": "^2.3",
-        "symfony/asset": "7.4.*",
-        "symfony/console": "7.4.*",
-        "symfony/dotenv": "7.4.*",
-        "symfony/expression-language": "7.4.*",
+        "api-platform/doctrine-orm": "^4.2.13",
+        "api-platform/symfony": "^4.2.13",
+        "doctrine/dbal": "^4.4.1",
+        "doctrine/doctrine-bundle": "^3.2.2",
+        "doctrine/orm": "^3.6.1",
+        "nelmio/cors-bundle": "^2.6.1",
+        "phpdocumentor/reflection-docblock": "^5.6.6",
+        "phpstan/phpdoc-parser": "^2.3.1",
+        "symfony/asset": "8.0.*",
+        "symfony/console": "8.0.*",
+        "symfony/dotenv": "8.0.*",
+        "symfony/expression-language": "8.0.*",
         "symfony/flex": "^2.10",
-        "symfony/framework-bundle": "7.4.*",
-        "symfony/object-mapper": "7.4.*",
-        "symfony/property-access": "7.4.*",
-        "symfony/property-info": "7.4.*",
-        "symfony/runtime": "7.4.*",
-        "symfony/security-bundle": "7.4.*",
-        "symfony/serializer": "7.4.*",
-        "symfony/twig-bundle": "7.4.*",
-        "symfony/validator": "7.4.*",
-        "symfony/yaml": "7.4.*"
+        "symfony/framework-bundle": "8.0.*",
+        "symfony/object-mapper": "8.0.*",
+        "symfony/property-access": "8.0.*",
+        "symfony/property-info": "8.0.*",
+        "symfony/runtime": "8.0.*",
+        "symfony/security-bundle": "8.0.*",
+        "symfony/serializer": "8.0.*",
+        "symfony/twig-bundle": "8.0.*",
+        "symfony/validator": "8.0.*",
+        "symfony/yaml": "8.0.*"
     },
     "config": {
         "allow-plugins": {
@@ -78,20 +78,20 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.4.*"
+            "require": "8.0.*"
         }
     },
     "require-dev": {
-        "dama/doctrine-test-bundle": "^8.4.1",
-        "justinrainbow/json-schema": "^6.6.3",
-        "phpunit/phpunit": "^12.5.4",
-        "symfony/browser-kit": "7.4.*",
-        "symfony/css-selector": "7.4.*",
-        "symfony/debug-bundle": "7.4.*",
-        "symfony/http-client": "7.4.*",
+        "dama/doctrine-test-bundle": "^8.6.0",
+        "justinrainbow/json-schema": "^6.6.4",
+        "phpunit/phpunit": "^12.5.6",
+        "symfony/browser-kit": "8.0.*",
+        "symfony/css-selector": "8.0.*",
+        "symfony/debug-bundle": "8.0.*",
+        "symfony/http-client": "8.0.*",
         "symfony/maker-bundle": "^1.65.1",
-        "symfony/monolog-bundle": "^3.11.1",
-        "symfony/stopwatch": "7.4.*",
-        "symfony/web-profiler-bundle": "7.4.*"
+        "symfony/monolog-bundle": "^4.0.1",
+        "symfony/stopwatch": "8.0.*",
+        "symfony/web-profiler-bundle": "8.0.*"
     }
 }
